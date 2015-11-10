@@ -113,8 +113,10 @@
                 				<option value="22">Registering Voters</option>
                 				<option value="24">Volunteer activity or meeting</option>
                 				<option value="25">Volunteer meeting to get organized or learn more</option>
-                				<option value="1">Test Type 1</option>
-                				<option value="2">Test Type 2</option>
+                				{% if debug %}
+                					<option value="1">Test Type 1</option>
+                					<option value="2">Test Type 2</option>
+                				{% endif %}
                 			</select>
                 		</div>
                 	</div>

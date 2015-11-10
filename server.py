@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('form.html')
+	return render_template('form.html', debug=app.debug)
 
 @app.route('/create', methods=['POST'])
 def create():
