@@ -19,10 +19,23 @@ def create_events(form, *args, **kwargs):
         'venue_zip': form['venue_zip'],
         'venue_city': form['venue_city'],
         'venue_state_cd': form['venue_state_cd'],
+        'venue_addr1' : form['venue_addr1'],
+        'venue_addr2' : form['venue_addr2'],
+        'venue_country' : form['venue_country'],
+        'venue_directions' : form['venue_directions'],
         'days' : [{
             'start_datetime_system': '', # This will be defined below
-            'duration': int(form['duration_num']) * int(form['duration'])
-        }]
+            'duration': int(form['duration_num']) * int(form['duration_unit']),
+            'capacity' : form['capacity']
+        }],
+        'local_timezone' : form['start_tz'],
+        'attendee_volunteer_message' : form['attendee_volunteer_message'],
+        'is_searchable' : form['is_searchable'],
+        'public_phone' : form['public_phone'],
+        'contact_phone' : form['contact_phone'],
+        'host_receive_rsvp_emails' : form['host_receive_rsvp_emails'],
+        'rsvp_use_reminder_email' : form['rsvp_use_reminder_email'],
+        'rsvp_reminder_hours' : form['rsvp_email_reminder_hours']
     }
 
     if form['start_time[a]'] == 'pm':
