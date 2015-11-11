@@ -1,15 +1,35 @@
 from bsdapi.URL import URL
 from bsdapi.BsdApi import Factory
+import bsdapi
 import json
 
 import settings
 
 api = Factory().create(
-    id=settings.BSD_ID, secret=settings.BSD_SECRET,
-    host=settings.BSD_HOST, port='80',
-    securePort='443')
+    id=settings.BSD_ID,
+    secret=settings.BSD_SECRET,
+    host=settings.BSD_HOST,
+    port='80',
+    securePort='443'
+)
+
+def check_credentials(form):
+    resp = api.account_checkCredentials(form['email'], form['pw'])
+    return resp.body
+
+def create_account(form):
+
+    if (form['password1'] != form['password2']):
+        return 'passwords do not match'
+    resp = api.account_createAccount(form['email'], form['password1'], form['firstname'], form['lastname'], form['zip'])
+    return resp.body
 
 def create_events(form, *args, **kwargs):
+
+    # validations
+    # Remove special characters from phone number
+    contact_phone = ''.join(e for e in form['contact_phone'] if e.isalnum())
+
     params = {
         'event_type_id': form['event_type_id'],
         'creator_cons_id': '1', # hardcoded for now
@@ -32,7 +52,7 @@ def create_events(form, *args, **kwargs):
         'attendee_volunteer_message' : form['attendee_volunteer_message'],
         'is_searchable' : form['is_searchable'],
         'public_phone' : form['public_phone'],
-        'contact_phone' : form['contact_phone'],
+        'contact_phone' : contact_phone,
         'host_receive_rsvp_emails' : form['host_receive_rsvp_emails'],
         'rsvp_use_reminder_email' : form['rsvp_use_reminder_email'],
         'rsvp_reminder_hours' : form['rsvp_email_reminder_hours']
