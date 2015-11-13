@@ -1054,14 +1054,8 @@
 	<option value="ZM">Zambia</option>
 	<option value="ZW">Zimbabwe</option>
 </select></div></div></div><div class="inputgroup"><div class="label">
-                    <label class="form_label">Location Name:</label><span style="color: red;">*</span> 
-                </div><div class="field">
-                    <input size="30" name="venue_name" id="venue_name" type="text" placeholder="" required></div></div><div class="inputgroup"><div class="label">
-                    <label class="form_label">Capacity Limit: </label><span style="color: red;">*</span> 
-                </div><div class="field">
-                    <input size="4" name="capacity" type="text" value="0" required></div></div><span class="explain">(includes guests; zero for no limit)</span><div class="inputgroup"><div class="label">
                     <label class="form_label">Address:</label></div><div class="field">
-                    <input size="30" name="venue_addr1" id="street_number" type="text" value=""></div></div><div class="inputgroup"><div class="field">
+                    <input size="30" name="venue_addr1" id="street_number" type="text" value="" placeholder=""></div></div><div class="inputgroup"><div class="field">
                     <input size="30" name="venue_addr2" id="route" type="text" style="margin-top: 10px;"></div></div><div class="inputgroup col city-col"><div class="label">
                     <label class="form_label">City:</label><span style="color: red;">*</span> 
                 </div><div class="field">
@@ -1136,10 +1130,20 @@
 </select></div></div></div><div class="inputgroup col zip-col"><div class="label">
                     <label class="form_label">ZIP Code:</label><span style="color: red;">*</span> 
                 </div><div class="field">
-                    <input size="6" maxlength="12" id="postal_code" name="venue_zip" type="number" value=""></div></div><div class="clear"></div><div class="inputgroup"><div class="label">
+                    <input size="6" maxlength="12" id="postal_code" name="venue_zip" type="number" value=""></div></div><div class="clear"></div>
+
+                    <div class="inputgroup"><div class="label">
+                                        <label class="form_label">Location Name:</label><span style="color: red;">*</span> 
+                                    </div><div class="field">
+                                        <input size="30" name="venue_name" id="venue_name" type="text" placeholder="" required></div></div><div class="inputgroup"><div class="label">
+                                        <label class="form_label">Capacity Limit: </label><span style="color: red;">*</span> 
+                                    </div><div class="field">
+                                        <input size="4" name="capacity" type="text" value="0" required></div></div><span class="explain">(includes guests; zero for no limit)</span>
+
+                    <div class="inputgroup"><div class="label">
                     <label class="form_label">Directions To Event:</label></div><div class="field">
                     <textarea rows="4" cols="30" name="venue_directions"></textarea></div></div><div class="inputgroup"><div class="label">
-                    <label class="form_label">Phone:</label><span style="color: red;">*</span> 
+                    <label class="form_label">Contact Phone:</label><span style="color: red;">*</span> 
                 </div><div class="field">
                     <input size="30" name="contact_phone" type="tel" required></div><div class="phone-instruct"><span style="color: red;">*</span><div class="explain"> A contact phone number is required.</div></div></div>
                     <div class="inputgroup"><div class="label">
@@ -1190,10 +1194,16 @@ jQuery(document).ready(function() {
 	          return event._clndrStartDateObject.format('YYYY-MM-DD') == target.date.format('YYYY-MM-DD');
 	        });
 
-	        // Also remove events on this date from the user_created_events array
-	        user_created_events = jQuery.grep(user_created_events, function(event) {
-	          return event.date != target.date.format('YYYY-MM-DD');
-	        });
+	        // Remove events on this date from the given arrays
+	        user_created_events = removeEventsOnDate(user_created_events);
+	        generated_events = removeEventsOnDate(generated_events);
+
+	        function removeEventsOnDate(array){
+	        	array = jQuery.grep(array, function(event) {
+	        	  return event.date != target.date.format('YYYY-MM-DD');
+	        	});
+	        	return array;
+	        }
 	      }
 	      else if(!$(target.element).hasClass('inactive')) {
 
@@ -1251,7 +1261,7 @@ jQuery(document).ready(function() {
 
 		   		var current_event = user_created_events[i];
 
-		   		for (var days=0; days<=max_days; days+=7){
+		   		for (var days=7; days<=max_days; days+=7){
 
 		   			var next_date = moment(current_event.moment.format('YYYY-MM-DD'));
 		   			next_date.isoWeekday(next_date.isoWeekday() + days);
@@ -1286,15 +1296,11 @@ jQuery(document).ready(function() {
 
 		    		var match_found = false;
 		    		while (!match_found){
-
 		    			next_date.date(next_date.date() + 1);
 
 		    			if (next_date.day() == current_event.moment.day() && Math.ceil(next_date.date() / 7) == week_of_month){
 		    				match_found = true;
 		    			}
-
-		    			console.log(next_date.day());
-
 		    		}
 
 		    		var new_event = {
@@ -1355,11 +1361,14 @@ jQuery(document).ready(function() {
 		e.preventDefault();
 		var formdata = $(this).serializeArray();
 
-		// current_events = $.merge( $.merge( [], user_created_events ), generated_events );
+		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
+
+		console.log(current_events);
+		return;
 
 		formdata.push({ 
 			name: "event_dates",
-			value: JSON.stringify(generated_events)
+			value: JSON.stringify(current_events)
 		});
 
 		$.ajax({
@@ -1414,7 +1423,7 @@ function initAutocomplete() {
   // Create the autocomplete object, restricting the search to geographical
   // location types.
   autocomplete = new google.maps.places.Autocomplete(
-      /** @type {!HTMLInputElement} */(document.getElementById('venue_name'))
+      /** @type {!HTMLInputElement} */(document.getElementById('street_number'))
       );
 
   // When the user selects an address from the dropdown, populate the address
@@ -1444,7 +1453,7 @@ function fillInAddress() {
       document.getElementById(addressType).value = val;
     }
   }
-  document.getElementById('venue_name').value = place.name;
+  document.getElementById('venue_name').placeholder = place.name;
   document.getElementById('street_number').value += " " + document.getElementById('route').value;
   document.getElementById('route').value = "";
 }
