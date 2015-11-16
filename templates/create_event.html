@@ -1363,9 +1363,6 @@ jQuery(document).ready(function() {
 
 		current_events = $.merge( $.merge( [], user_created_events ), generated_events );
 
-		console.log(current_events);
-		return;
-
 		formdata.push({ 
 			name: "event_dates",
 			value: JSON.stringify(current_events)
